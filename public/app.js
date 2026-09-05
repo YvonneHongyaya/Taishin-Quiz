@@ -124,10 +124,9 @@ socket.on("game:question", (payload) => {
   $("options-grid").innerHTML = "";
   $("submitted-box").classList.add("hidden");
   $("btn-end-now").classList.toggle("hidden", role !== "host");
-  $("question-block-wait").classList.toggle("hidden", role !== "host");
-  if (role === "host") {
-    $("question-text-wait").textContent = question.q;
-  }
+  // 題目文字：主持人畫面跟玩家手機畫面都要顯示
+  $("question-block-wait").classList.remove("hidden");
+  $("question-text-wait").textContent = question.q;
 
   question.options.forEach((opt, i) => {
     const btn = document.createElement(role === "host" ? "div" : "button");
