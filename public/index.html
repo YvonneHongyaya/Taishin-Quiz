@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>台新知識王</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="app" class="shell">
+
+    <!-- 角色選擇 -->
+    <section id="screen-role" class="card">
+      <div class="logo">✨ <h1>台新知識王</h1></div>
+      <p class="subtitle">台新銀行冷知識大挑戰・正賽 10 題＋延長賽 10 題</p>
+      <div class="stack">
+        <button id="btn-be-host" class="btn btn-primary">我是主持人・開新遊戲</button>
+        <button id="btn-be-player" class="btn btn-secondary">我要加入遊戲</button>
+      </div>
+      <p class="hint">大家都打開同一個連結，主持人只要有一位負責建立遊戲即可。完全不需要登入任何帳號。</p>
+    </section>
+
+    <!-- 玩家：加入表單 -->
+    <section id="screen-join" class="card hidden">
+      <div class="logo small">✨ <h1>台新知識王</h1></div>
+      <p class="subtitle" id="join-subtitle">輸入你的暱稱加入遊戲</p>
+      <input id="input-code" class="input" placeholder="遊戲代碼（例如 AB3F9）" maxlength="5" style="text-transform:uppercase" />
+      <input id="input-name" class="input" placeholder="你的暱稱" maxlength="12" />
+      <button id="btn-join" class="btn btn-teal">加入遊戲</button>
+      <p id="join-error" class="error hidden"></p>
+    </section>
+
+    <!-- 玩家：等待大廳 -->
+    <section id="screen-player-lobby" class="card hidden">
+      <div class="center">
+        <div class="big-emoji">✨</div>
+        <p class="hello" id="player-hello"></p>
+        <p class="pulse">等待主持人開始遊戲…</p>
+      </div>
+    </section>
+
+    <!-- 玩家：已開始但無法加入 -->
+    <section id="screen-late" class="card hidden">
+      <div class="logo small">✨ <h1>台新知識王</h1></div>
+      <p class="subtitle">遊戲已經開始了，請等待下一場再加入喔！</p>
+    </section>
+
+    <!-- 主持人：建立遊戲 -->
+    <section id="screen-host-create" class="card">
+      <div class="logo"><h1>✨ 台新知識王</h1></div>
+      <p class="subtitle">按下按鈕建立遊戲，再把產生的連結分享給所有人</p>
+      <button id="btn-create" class="btn btn-primary">建立新遊戲</button>
+    </section>
+
+    <!-- 主持人：大廳 -->
+    <section id="screen-host-lobby" class="card wide hidden">
+      <div class="logo"><h1>✨ 台新知識王</h1></div>
+      <div class="panel light center">
+        <p class="dark-text">請把這個連結分享給所有玩家（完全不需要登入任何帳號）</p>
+        <button id="btn-copy" class="btn btn-dark small">📋 複製連結</button>
+      </div>
+      <div class="panel dark center">
+        <div class="big-number" id="lobby-count">0</div>
+        <p class="muted">人已加入遊戲</p>
+      </div>
+      <button id="btn-start" class="btn btn-teal" disabled>開始遊戲（正賽 10 題，隨機出題）</button>
+      <p class="hint">另外備有 10 題延長賽題目，正賽結束後可視情況加碼使用。</p>
+    </section>
+
+    <!-- 出題畫面（host 與 player 共用結構，靠 class 區分內容） -->
+    <section id="screen-question" class="card wide hidden">
+      <div class="row-between">
+        <span class="tag" id="phase-tag"></span>
+        <span class="muted small" id="answered-count"></span>
+      </div>
+      <div class="timerbar"><div class="timerbar-fill" id="timer-fill"></div></div>
+      <div id="question-block-wait" class="panel light center hidden">
+        <p class="dark-text bold" id="question-text-wait"></p>
+      </div>
+      <div id="options-grid" class="options-grid"></div>
+      <button id="btn-end-now" class="btn btn-dark hidden">提前公布答案</button>
+      <div id="submitted-box" class="panel dark center hidden">
+        <div class="big-emoji">✅</div>
+        <p class="dark-text bold">已送出答案！</p>
+        <p class="muted small">等待其他人作答…</p>
+      </div>
+    </section>
+
+    <!-- 公布答案畫面 -->
+    <section id="screen-reveal" class="card wide hidden">
+      <div id="result-banner" class="panel center hidden">
+        <div class="big-emoji" id="result-emoji"></div>
+        <p class="result-title" id="result-title"></p>
+        <p class="result-sub" id="result-sub"></p>
+      </div>
+      <div class="panel light">
+        <p class="dark-text bold" id="reveal-question"></p>
+        <div id="reveal-options"></div>
+        <p class="fact" id="reveal-fact"></p>
+      </div>
+      <div class="panel dark center" id="my-score-box">
+        <p class="muted small">目前累積分數</p>
+        <p class="big-number gold" id="my-score">0</p>
+      </div>
+      <button id="btn-advance" class="btn btn-primary hidden"></button>
+      <div id="mini-leaderboard"></div>
+      <p class="pulse" id="waiting-host">等待主持人繼續下一題…</p>
+    </section>
+
+    <!-- 正賽/延長賽 結束的中繼畫面（host 用） -->
+    <section id="screen-phase-ended" class="card wide hidden">
+      <div class="center">
+        <div class="big-emoji">🏆</div>
+        <h2 id="phase-ended-title"></h2>
+      </div>
+      <div class="panel dark" id="phase-leaderboard"></div>
+      <div class="stack">
+        <button id="btn-start-extra" class="btn btn-primary hidden">🔥 同分或想加碼？開始延長賽</button>
+        <button id="btn-continue-extra" class="btn btn-primary hidden">🔥 再加一題延長賽</button>
+        <button id="btn-finish" class="btn btn-teal">結束遊戲，公布最終結果</button>
+      </div>
+    </section>
+
+    <!-- 玩家：正賽/延長賽 結束等待畫面 -->
+    <section id="screen-player-phase-ended" class="card hidden">
+      <div class="center">
+        <div class="big-emoji">🏆</div>
+        <p class="hello" id="player-phase-ended-title"></p>
+        <div class="panel dark center">
+          <p class="muted small">目前累積分數</p>
+          <p class="big-number gold" id="player-phase-score">0</p>
+        </div>
+        <p class="pulse">等待主持人決定是否加開延長賽…</p>
+      </div>
+    </section>
+
+    <!-- 最終結果 -->
+    <section id="screen-finished" class="card wide hidden">
+      <div class="center">
+        <div class="big-emoji">🏆</div>
+        <h2>遊戲結束！</h2>
+      </div>
+      <div id="podium" class="podium"></div>
+      <div class="panel dark" id="final-leaderboard"></div>
+      <p class="hint" id="final-note"></p>
+    </section>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
